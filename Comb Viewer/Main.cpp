@@ -1,5 +1,7 @@
 ﻿// include
 #include "Main.h"
+#include "Utilities.h"
+#include "Viewing.h"
 
 void Main()
 {
@@ -9,7 +11,8 @@ void Main()
 	turnToFullScreen();
 
 	// シーン 初期化
-	SceneManager<String, sharedData> sceneMgr;
+	MyApp sceneMgr;
+	sceneMgr.add<Viewing>(U"Viewing");
 
 	// メインループ
 	while (System::Update())
