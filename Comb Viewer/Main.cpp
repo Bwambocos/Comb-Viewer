@@ -1,22 +1,18 @@
-﻿
-# include <Siv3D.hpp> // OpenSiv3D v0.2.8
+﻿// include
+#include "Main.h"
 
 void Main()
 {
-	Graphics::SetBackground(ColorF(0.8, 0.9, 1.0));
+	// ウィンドウ関連 初期化
+	Window::SetTitle(U"Comb Viewer " + versionStr);
 
-	const Font font(50);
+	// シーン 初期化
+	SceneManager<String, sharedData> sceneMgr;
 
-	const Texture textureCat(Emoji(U"🐈"), TextureDesc::Mipped);
-
+	// メインループ
 	while (System::Update())
 	{
-		font(U"Hello, Siv3D!🐣").drawAt(Window::Center(), Palette::Black);
-
-		font(Cursor::Pos()).draw(20, 400, ColorF(0.6));
-
-		textureCat.resized(80).draw(540, 380);
-
-		Circle(Cursor::Pos(), 60).draw(ColorF(1, 0, 0, 0.5));
+		sceneMgr.updateScene();
+		sceneMgr.drawScene();
 	}
 }
