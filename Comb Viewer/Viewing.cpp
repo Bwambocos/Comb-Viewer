@@ -27,12 +27,25 @@ Viewing::Viewing(const InitData& init) :IScene(init)
 	makerFont = Font(36, Typeface::Medium);
 	// descriptionFont = Font(28);
 	detailsRect = Rect(0, Window::Height() - titleFont.height() - 30, Window::Width(), titleFont.height() + 30);
+	detailsRectTimer.reset();
+	prevMouseP = Cursor::Pos();
+	detailsRectDrawFlag = true;
 }
 
 // ‰æ‘œ‰{—— XV
 void Viewing::update()
 {
-
+	if (prevMouseP == Cursor::Pos())
+	{
+		detailsRectTimer.update();
+		if (detailsRectTimer.query() >= detailsRectStairMilliSec) detailsRectDrawFlag = false;
+	}
+	else
+	{
+		prevMouseP = Cursor::Pos();
+		detailsRectTimer.reset();
+		detailsRectDrawFlag = true;
+	}
 }
 
 // ‰æ‘œ‰{—— •`‰æ
@@ -41,10 +54,13 @@ void Viewing::draw() const
 	for (auto work : works)
 	{
 		work.workImage.scaled(work.ragRatio).drawAt(work.x, work.y);
-		detailsRect.draw(Color(48, 48, 48));
-		detailsRect.drawFrame(2, 1, Color(64, 64, 64));
-		titleFont(work.titleName).draw(15, detailsRect.y + detailsRect.h / 2 - titleFont.height() / 2, Palette::White);
-		makerFont(work.makerName).draw(Window::Width() - makerFont(work.makerName).region().w - 15, detailsRect.y + detailsRect.h / 2 - makerFont.height() / 2, Palette::White);
+		if (detailsRectDrawFlag)
+		{
+			detailsRect.draw(Color(48, 48, 48, 150));
+			detailsRect.drawFrame(3, 2, Color(64, 64, 64));
+			titleFont(work.titleName).draw(15, detailsRect.y + detailsRect.h / 2 - titleFont.height() / 2, Palette::White);
+			makerFont(work.makerName).draw(Window::Width() - makerFont(work.makerName).region().w - 15, detailsRect.y + detailsRect.h / 2 - makerFont.height() / 2, Palette::White);
+			Rect(0, detailsRect.y - workShadowHeight, Window::Width(), workShadowHeight)(shadowImage).draw();
+		}
 	}
-	Rect(0, detailsRect.y - 30, Window::Width(), 30)(shadowImage).draw();
 }

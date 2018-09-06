@@ -2,6 +2,11 @@
 #pragma once
 #include <Siv3D.hpp>
 #include <HamFramework.hpp>
+#include "Utilities.h"
+
+// const
+const int32 workShadowHeight = 50;
+const uint64 detailsRectStairMilliSec = 3000;
 
 // ç\ë¢ëÃ
 struct work
@@ -20,6 +25,9 @@ private:
 	Texture shadowImage;
 	Font titleFont, makerFont, descriptionFont;
 	Rect detailsRect;
+	myTimer detailsRectTimer;
+	Point prevMouseP;
+	bool detailsRectDrawFlag;
 
 public:
 	Viewing(const InitData& init);
