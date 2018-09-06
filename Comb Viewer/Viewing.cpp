@@ -18,18 +18,22 @@ Viewing::Viewing(const InitData& init) :IScene(init)
 		// while (descriptionReader.readLine(tempDescription)) tempWork.description += tempDescription;
 		tempWork.x = Window::Width() / 2;
 		tempWork.y = Window::Height() / 2;
-		if (tempWork.workImage.height() >= tempWork.workImage.width()) tempWork.ragRatio = (double)Window::Height() / tempWork.workImage.height();
-		else tempWork.ragRatio = (double)Window::Width() / tempWork.workImage.width();
+		tempWork.ragRatio = Min((double)Window::Height() / tempWork.workImage.height(), (double)Window::Width() / tempWork.workImage.width());
 		works.push_back(tempWork);
 	}
 	shadowImage = Texture(U"data//shadowImage.png");
 	titleFont = Font(48, Typeface::Bold);
 	makerFont = Font(36, Typeface::Medium);
 	// descriptionFont = Font(28);
+	goLeftTrg = Triangle(15, Window::Height() / 2, 45, Window::Height() / 2 - 30, 45, Window::Height() / 2 + 30);
+	goRightTrg = Triangle(Window::Width() - 15, Window::Height() / 2, Window::Width() - 45, Window::Height() / 2 - 30, Window::Width() - 45, Window::Height() / 2 + 30);
 	detailsRect = Rect(0, Window::Height() - titleFont.height() - 30, Window::Width(), titleFont.height() + 30);
+	goLeftRect = Rect(0, 0, 60, Window::Height());
+	goRightRect = Rect(Window::Width() - 60, 0, 60, Window::Height());
 	detailsRectTimer.reset();
 	prevMouseP = Cursor::Pos();
 	detailsRectDrawFlag = true;
+	nowWorkNum = 0;
 }
 
 // âÊëúâ{óó çXêV
@@ -46,21 +50,41 @@ void Viewing::update()
 		detailsRectTimer.reset();
 		detailsRectDrawFlag = true;
 	}
+	if (KeyRight.down() || goRightRect.leftClicked())
+	{
+		++nowWorkNum;
+		nowWorkNum %= works.size();
+		prevMouseP = Cursor::Pos();
+		detailsRectTimer.reset();
+		detailsRectDrawFlag = true;
+	}
+	if (KeyLeft.down() || goLeftRect.leftClicked())
+	{
+		--nowWorkNum;
+		nowWorkNum = (nowWorkNum + works.size()) % works.size();
+		prevMouseP = Cursor::Pos();
+		detailsRectTimer.reset();
+		detailsRectDrawFlag = true;
+	}
 }
 
 // âÊëúâ{óó ï`âÊ
 void Viewing::draw() const
 {
-	for (auto work : works)
+	auto work = works[nowWorkNum];
+	work.workImage.scaled(work.ragRatio).drawAt(work.x, work.y);
+	if (detailsRectDrawFlag)
 	{
-		work.workImage.scaled(work.ragRatio).drawAt(work.x, work.y);
-		if (detailsRectDrawFlag)
-		{
-			detailsRect.draw(Color(48, 48, 48, 150));
-			detailsRect.drawFrame(3, 2, Color(64, 64, 64));
-			titleFont(work.titleName).draw(15, detailsRect.y + detailsRect.h / 2 - titleFont.height() / 2, Palette::White);
-			makerFont(work.makerName).draw(Window::Width() - makerFont(work.makerName).region().w - 15, detailsRect.y + detailsRect.h / 2 - makerFont.height() / 2, Palette::White);
-			Rect(0, detailsRect.y - workShadowHeight, Window::Width(), workShadowHeight)(shadowImage).draw();
-		}
+		goLeftRect.draw(rectColor);
+		goLeftRect.drawFrame(3, 2, frameColor);
+		goLeftTrg.draw(goLeftRect.mouseOver() ? Color(255, 165, 0, 150) : Color(200, 200, 200, 150));
+		goRightRect.draw(rectColor);
+		goRightRect.drawFrame(3, 2, frameColor);
+		goRightTrg.draw(goRightRect.mouseOver() ? Color(255, 165, 0, 150) : Color(200, 200, 200, 150));
+		detailsRect.draw(rectColor);
+		detailsRect.drawFrame(3, 2, frameColor);
+		titleFont(work.titleName).draw(15, detailsRect.y + detailsRect.h / 2 - titleFont.height() / 2, Palette::White);
+		makerFont(work.makerName).draw(Window::Width() - makerFont(work.makerName).region().w - 15, detailsRect.y + detailsRect.h / 2 - makerFont.height() / 2, Palette::White);
+		Rect(0, detailsRect.y - workShadowHeight, Window::Width(), workShadowHeight)(shadowImage).draw();
 	}
 }

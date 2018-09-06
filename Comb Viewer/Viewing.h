@@ -7,6 +7,8 @@
 // const
 const int32 workShadowHeight = 50;
 const uint64 detailsRectStairMilliSec = 3000;
+const Color rectColor = Color(48, 48, 48, 150);
+const Color frameColor = Color(64, 64, 64);
 
 // ç\ë¢ëÃ
 struct work
@@ -24,10 +26,12 @@ private:
 	Array<work>works;
 	Texture shadowImage;
 	Font titleFont, makerFont, descriptionFont;
-	Rect detailsRect;
+	Triangle goLeftTrg, goRightTrg;
+	Rect detailsRect, goLeftRect, goRightRect;
 	myTimer detailsRectTimer;
 	Point prevMouseP;
 	bool detailsRectDrawFlag;
+	int nowWorkNum;
 
 public:
 	Viewing(const InitData& init);
