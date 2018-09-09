@@ -25,6 +25,8 @@ Viewing::Viewing(const InitData& init) :IScene(init)
 	plusImage = Texture(U"data//plusImage.png");
 	minusImage = Texture(U"data//minusImage.png");
 	resetImage = Texture(U"data//resetImage.png");
+	pinImage[0] = Texture(U"data//pinImage_0.png");
+	pinImage[1] = Texture(U"data//pinImage_1.png");
 	titleFont = Font(48, Typeface::Bold);
 	makerFont = Font(36, Typeface::Medium);
 	// descriptionFont = Font(28);
@@ -36,18 +38,23 @@ Viewing::Viewing(const InitData& init) :IScene(init)
 	detailsRectTimer.reset();
 	prevMouseP = Cursor::Pos();
 	detailsRectDrawFlag = true;
+	pinnedFlag = false;
 	nowWorkNum = 0;
 }
 
 // ‰æ‘œ‰{—— XV
 void Viewing::update()
 {
-	if (prevMouseP == Cursor::Pos())
+	if (!pinnedFlag)
 	{
-		detailsRectTimer.update();
-		if (detailsRectTimer.query() >= detailsRectStairMilliSec) detailsRectDrawFlag = false;
+		if (prevMouseP == Cursor::Pos())
+		{
+			detailsRectTimer.update();
+			if (detailsRectTimer.query() >= detailsRectStairMilliSec) detailsRectDrawFlag = false;
+		}
+		else resetDetailsRectTimer();
 	}
-	else resetDetailsRectTimer();
+	else detailsRectDrawFlag = true;
 	if (KeyRight.down() || goRightRect.leftClicked())
 	{
 		++nowWorkNum;
@@ -116,6 +123,7 @@ void Viewing::update()
 		work.x = Window::Width() / 2;
 		work.y = Window::Height() / 2;
 	}
+	if (pinImage[pinnedFlag].region(goLeftRect.x + goLeftRect.w + 15, 15).leftClicked()) pinnedFlag = !pinnedFlag;
 }
 
 // ‰æ‘œ‰{—— •`‰æ
@@ -139,6 +147,7 @@ void Viewing::draw() const
 		plusImage.draw(goRightRect.x - plusImage.width() - 15, 15);
 		minusImage.draw(goRightRect.x - plusImage.width() - minusImage.width() - 30, 15);
 		resetImage.draw(goRightRect.x - plusImage.width() - minusImage.width() - resetImage.width() - 45, 15);
+		pinImage[pinnedFlag].draw(goLeftRect.x + goLeftRect.w + 15, 15);
 	}
 }
 

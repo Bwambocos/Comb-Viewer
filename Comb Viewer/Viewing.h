@@ -26,13 +26,13 @@ class Viewing :public MyApp::Scene
 {
 private:
 	Array<work>works;
-	Texture shadowImage, plusImage, minusImage, resetImage;
+	Texture shadowImage, plusImage, minusImage, resetImage, pinImage[2];
 	Font titleFont, makerFont, descriptionFont;
 	Triangle goLeftTrg, goRightTrg;
 	Rect detailsRect, goLeftRect, goRightRect;
 	myTimer detailsRectTimer;
 	Point prevMouseP;
-	bool detailsRectDrawFlag;
+	bool detailsRectDrawFlag, pinnedFlag;
 	int nowWorkNum;
 
 public:
