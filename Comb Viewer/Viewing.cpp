@@ -72,6 +72,43 @@ void Viewing::update()
 	}
 	work.ragRatio += Mouse::Wheel();
 	work.ragRatio = Max(work.ragRatio, work.ragRatio_def);
+	if (MouseL.pressed())
+	{
+		work.x += Cursor::ScreenDelta().x;
+		work.y += Cursor::ScreenDelta().y;
+		if (work.workImage.width()*work.ragRatio <= Window::Width())
+		{
+			work.x = Min<double>(work.x, Window::Width() - work.workImage.width()*work.ragRatio / 2);	// âEï”
+			work.x = Max<double>(work.x, work.workImage.width()*work.ragRatio / 2);	// ç∂ï”
+		}
+		else
+		{
+			if (work.x + work.workImage.width()*work.ragRatio / 2 < Window::Width())
+			{
+				work.x = Window::Width() - work.workImage.width()*work.ragRatio / 2;
+			}
+			if (work.x - work.workImage.width()*work.ragRatio / 2 > 0)
+			{
+				work.x = work.workImage.width()*work.ragRatio / 2;
+			}
+		}
+		if (work.workImage.height()*work.ragRatio <= Window::Height())
+		{
+			work.y = Min<double>(work.y, Window::Height() - work.workImage.height()*work.ragRatio / 2);	// âEï”
+			work.y = Max<double>(work.y, work.workImage.height()*work.ragRatio / 2);	// ç∂ï”
+		}
+		else
+		{
+			if (work.y + work.workImage.height()*work.ragRatio / 2 < Window::Height())
+			{
+				work.y = Window::Height() - work.workImage.height()*work.ragRatio / 2;
+			}
+			if (work.y - work.workImage.height()*work.ragRatio / 2 > 0)
+			{
+				work.y = work.workImage.height()*work.ragRatio / 2;
+			}
+		}
+	}
 }
 
 // âÊëúâ{óó ï`âÊ
