@@ -26,7 +26,7 @@ class Viewing :public MyApp::Scene
 {
 private:
 	Array<work>works;
-	Texture shadowImage, plusImage, minusImage;
+	Texture shadowImage, plusImage, minusImage, resetImage;
 	Font titleFont, makerFont, descriptionFont;
 	Triangle goLeftTrg, goRightTrg;
 	Rect detailsRect, goLeftRect, goRightRect;

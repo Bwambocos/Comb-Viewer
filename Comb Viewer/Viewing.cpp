@@ -24,6 +24,7 @@ Viewing::Viewing(const InitData& init) :IScene(init)
 	shadowImage = Texture(U"data//shadowImage.png");
 	plusImage = Texture(U"data//plusImage.png");
 	minusImage = Texture(U"data//minusImage.png");
+	resetImage = Texture(U"data//resetImage.png");
 	titleFont = Font(48, Typeface::Bold);
 	makerFont = Font(36, Typeface::Medium);
 	// descriptionFont = Font(28);
@@ -78,8 +79,8 @@ void Viewing::update()
 		work.y += Cursor::ScreenDelta().y;
 		if (work.workImage.width()*work.ragRatio <= Window::Width())
 		{
-			work.x = Min<double>(work.x, Window::Width() - work.workImage.width()*work.ragRatio / 2);	// âEï”
-			work.x = Max<double>(work.x, work.workImage.width()*work.ragRatio / 2);	// ç∂ï”
+			work.x = Min<double>(work.x, Window::Width() - work.workImage.width()*work.ragRatio / 2);
+			work.x = Max<double>(work.x, work.workImage.width()*work.ragRatio / 2);
 		}
 		else
 		{
@@ -94,8 +95,8 @@ void Viewing::update()
 		}
 		if (work.workImage.height()*work.ragRatio <= Window::Height())
 		{
-			work.y = Min<double>(work.y, Window::Height() - work.workImage.height()*work.ragRatio / 2);	// âEï”
-			work.y = Max<double>(work.y, work.workImage.height()*work.ragRatio / 2);	// ç∂ï”
+			work.y = Min<double>(work.y, Window::Height() - work.workImage.height()*work.ragRatio / 2);
+			work.y = Max<double>(work.y, work.workImage.height()*work.ragRatio / 2);
 		}
 		else
 		{
@@ -108,6 +109,12 @@ void Viewing::update()
 				work.y = work.workImage.height()*work.ragRatio / 2;
 			}
 		}
+	}
+	if (resetImage.region(goRightRect.x - plusImage.width() - minusImage.width() - resetImage.width() - 45, 15).leftClicked())
+	{
+		work.ragRatio = work.ragRatio_def;
+		work.x = Window::Width() / 2;
+		work.y = Window::Height() / 2;
 	}
 }
 
@@ -131,6 +138,7 @@ void Viewing::draw() const
 		Rect(0, detailsRect.y - workShadowHeight, Window::Width(), workShadowHeight)(shadowImage).draw();
 		plusImage.draw(goRightRect.x - plusImage.width() - 15, 15);
 		minusImage.draw(goRightRect.x - plusImage.width() - minusImage.width() - 30, 15);
+		resetImage.draw(goRightRect.x - plusImage.width() - minusImage.width() - resetImage.width() - 45, 15);
 	}
 }
 
