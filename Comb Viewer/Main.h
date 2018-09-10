@@ -10,3 +10,5 @@ struct sharedData
 {
 
 };
+
+using MyApp = SceneManager<String, sharedData>;
