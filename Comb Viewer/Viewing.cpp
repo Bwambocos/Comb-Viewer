@@ -27,6 +27,9 @@ Viewing::Viewing(const InitData& init) :IScene(init)
 	resetImage = Texture(U"data//resetImage.png");
 	pinImage[0] = Texture(U"data//pinImage_0.png");
 	pinImage[1] = Texture(U"data//pinImage_1.png");
+	slideshowImage[0] = Texture(U"data//slideshowImage_0.png");
+	slideshowImage[1] = Texture(U"data//slideshowImage_1.png");
+	exitImage = Texture(U"data//exitImage.png");
 	titleFont = Font(48, Typeface::Bold);
 	makerFont = Font(36, Typeface::Medium);
 	// descriptionFont = Font(28);
@@ -39,6 +42,7 @@ Viewing::Viewing(const InitData& init) :IScene(init)
 	prevMouseP = Cursor::Pos();
 	detailsRectDrawFlag = true;
 	pinnedFlag = false;
+	slideshowFlag = false;
 	nowWorkNum = 0;
 }
 
@@ -55,7 +59,7 @@ void Viewing::update()
 		else resetDetailsRectTimer();
 	}
 	else detailsRectDrawFlag = true;
-	if (KeyRight.down() || goRightRect.leftClicked())
+	if (KeyRight.down() || goRightRect.leftClicked() || slideshowTimer.query() >= slideshowMilliSec)
 	{
 		++nowWorkNum;
 		nowWorkNum %= works.size();
@@ -124,6 +128,17 @@ void Viewing::update()
 		work.y = Window::Height() / 2;
 	}
 	if (pinImage[pinnedFlag].region(goLeftRect.x + goLeftRect.w + 15, 15).leftClicked()) pinnedFlag = !pinnedFlag;
+	if (slideshowImage[slideshowFlag].region(goLeftRect.x + goLeftRect.w + pinImage[pinnedFlag].width() + 30, 15).leftClicked())
+	{
+		slideshowFlag = !slideshowFlag;
+		slideshowTimer.reset();
+	}
+	if (slideshowFlag)
+	{
+		if (slideshowTimer.query() >= slideshowMilliSec) slideshowTimer.reset();
+		slideshowTimer.update();
+	}
+	if (exitImage.region(goLeftRect.x + goLeftRect.w + pinImage[pinnedFlag].width() + slideshowImage[slideshowFlag].width() + 45, 15).leftClicked()) System::Exit();
 }
 
 // ‰æ‘œ‰{—— •`‰æ
@@ -148,6 +163,8 @@ void Viewing::draw() const
 		minusImage.draw(goRightRect.x - plusImage.width() - minusImage.width() - 30, 15);
 		resetImage.draw(goRightRect.x - plusImage.width() - minusImage.width() - resetImage.width() - 45, 15);
 		pinImage[pinnedFlag].draw(goLeftRect.x + goLeftRect.w + 15, 15);
+		slideshowImage[slideshowFlag].draw(goLeftRect.x + goLeftRect.w + pinImage[pinnedFlag].width() + 30, 15);
+		exitImage.draw(goLeftRect.x + goLeftRect.w + pinImage[pinnedFlag].width() + slideshowImage[slideshowFlag].width() + 45, 15);
 	}
 }
 

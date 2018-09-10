@@ -5,8 +5,9 @@
 #include "Utilities.h"
 
 // const
-const int32 workShadowHeight = 50;
+const int32 workShadowHeight = 25;
 const uint64 detailsRectStairMilliSec = 3000;
+const uint64 slideshowMilliSec = 7500;
 const Color rectColor = Color(48, 48, 48, 150);
 const Color frameColor = Color(64, 64, 64);
 const Color highlightColor = Color(255, 165, 0, 150);
@@ -26,13 +27,13 @@ class Viewing :public MyApp::Scene
 {
 private:
 	Array<work>works;
-	Texture shadowImage, plusImage, minusImage, resetImage, pinImage[2];
+	Texture shadowImage, plusImage, minusImage, resetImage, pinImage[2], slideshowImage[2], exitImage;
 	Font titleFont, makerFont, descriptionFont;
 	Triangle goLeftTrg, goRightTrg;
 	Rect detailsRect, goLeftRect, goRightRect;
-	myTimer detailsRectTimer;
+	myTimer detailsRectTimer, slideshowTimer;
 	Point prevMouseP;
-	bool detailsRectDrawFlag, pinnedFlag;
+	bool detailsRectDrawFlag, pinnedFlag, slideshowFlag;
 	int nowWorkNum;
 
 public:
