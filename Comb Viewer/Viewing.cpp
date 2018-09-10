@@ -24,6 +24,12 @@ Viewing::Viewing(const InitData& init) :IScene(init)
 	shadowImage = Texture(U"data//shadowImage.png");
 	plusImage = Texture(U"data//plusImage.png");
 	minusImage = Texture(U"data//minusImage.png");
+	resetImage = Texture(U"data//resetImage.png");
+	pinImage[0] = Texture(U"data//pinImage_0.png");
+	pinImage[1] = Texture(U"data//pinImage_1.png");
+	slideshowImage[0] = Texture(U"data//slideshowImage_0.png");
+	slideshowImage[1] = Texture(U"data//slideshowImage_1.png");
+	exitImage = Texture(U"data//exitImage.png");
 	titleFont = Font(48, Typeface::Bold);
 	makerFont = Font(36, Typeface::Medium);
 	// descriptionFont = Font(28);
@@ -35,19 +41,25 @@ Viewing::Viewing(const InitData& init) :IScene(init)
 	detailsRectTimer.reset();
 	prevMouseP = Cursor::Pos();
 	detailsRectDrawFlag = true;
+	pinnedFlag = false;
+	slideshowFlag = false;
 	nowWorkNum = 0;
 }
 
 // âÊëúâ{óó çXêV
 void Viewing::update()
 {
-	if (prevMouseP == Cursor::Pos())
+	if (!pinnedFlag)
 	{
-		detailsRectTimer.update();
-		if (detailsRectTimer.query() >= detailsRectStairMilliSec) detailsRectDrawFlag = false;
+		if (prevMouseP == Cursor::Pos())
+		{
+			detailsRectTimer.update();
+			if (detailsRectTimer.query() >= detailsRectStairMilliSec) detailsRectDrawFlag = false;
+		}
+		else resetDetailsRectTimer();
 	}
-	else resetDetailsRectTimer();
-	if (KeyRight.down() || goRightRect.leftClicked())
+	else detailsRectDrawFlag = true;
+	if (KeyRight.down() || goRightRect.leftClicked() || slideshowTimer.query() >= slideshowMilliSec)
 	{
 		++nowWorkNum;
 		nowWorkNum %= works.size();
@@ -78,8 +90,8 @@ void Viewing::update()
 		work.y += Cursor::ScreenDelta().y;
 		if (work.workImage.width()*work.ragRatio <= Window::Width())
 		{
-			work.x = Min<double>(work.x, Window::Width() - work.workImage.width()*work.ragRatio / 2);	// âEï”
-			work.x = Max<double>(work.x, work.workImage.width()*work.ragRatio / 2);	// ç∂ï”
+			work.x = Min<double>(work.x, Window::Width() - work.workImage.width()*work.ragRatio / 2);
+			work.x = Max<double>(work.x, work.workImage.width()*work.ragRatio / 2);
 		}
 		else
 		{
@@ -94,8 +106,8 @@ void Viewing::update()
 		}
 		if (work.workImage.height()*work.ragRatio <= Window::Height())
 		{
-			work.y = Min<double>(work.y, Window::Height() - work.workImage.height()*work.ragRatio / 2);	// âEï”
-			work.y = Max<double>(work.y, work.workImage.height()*work.ragRatio / 2);	// ç∂ï”
+			work.y = Min<double>(work.y, Window::Height() - work.workImage.height()*work.ragRatio / 2);
+			work.y = Max<double>(work.y, work.workImage.height()*work.ragRatio / 2);
 		}
 		else
 		{
@@ -109,6 +121,24 @@ void Viewing::update()
 			}
 		}
 	}
+	if (resetImage.region(goRightRect.x - plusImage.width() - minusImage.width() - resetImage.width() - 45, 15).leftClicked())
+	{
+		work.ragRatio = work.ragRatio_def;
+		work.x = Window::Width() / 2;
+		work.y = Window::Height() / 2;
+	}
+	if (pinImage[pinnedFlag].region(goLeftRect.x + goLeftRect.w + 15, 15).leftClicked()) pinnedFlag = !pinnedFlag;
+	if (slideshowImage[slideshowFlag].region(goLeftRect.x + goLeftRect.w + pinImage[pinnedFlag].width() + 30, 15).leftClicked())
+	{
+		slideshowFlag = !slideshowFlag;
+		slideshowTimer.reset();
+	}
+	if (slideshowFlag)
+	{
+		if (slideshowTimer.query() >= slideshowMilliSec) slideshowTimer.reset();
+		slideshowTimer.update();
+	}
+	if (exitImage.region(goLeftRect.x + goLeftRect.w + pinImage[pinnedFlag].width() + slideshowImage[slideshowFlag].width() + 45, 15).leftClicked()) System::Exit();
 }
 
 // âÊëúâ{óó ï`âÊ
@@ -131,6 +161,10 @@ void Viewing::draw() const
 		Rect(0, detailsRect.y - workShadowHeight, Window::Width(), workShadowHeight)(shadowImage).draw();
 		plusImage.draw(goRightRect.x - plusImage.width() - 15, 15);
 		minusImage.draw(goRightRect.x - plusImage.width() - minusImage.width() - 30, 15);
+		resetImage.draw(goRightRect.x - plusImage.width() - minusImage.width() - resetImage.width() - 45, 15);
+		pinImage[pinnedFlag].draw(goLeftRect.x + goLeftRect.w + 15, 15);
+		slideshowImage[slideshowFlag].draw(goLeftRect.x + goLeftRect.w + pinImage[pinnedFlag].width() + 30, 15);
+		exitImage.draw(goLeftRect.x + goLeftRect.w + pinImage[pinnedFlag].width() + slideshowImage[slideshowFlag].width() + 45, 15);
 	}
 }
 
