@@ -68,7 +68,7 @@ void Viewing::update()
 	if (KeyLeft.down() || goLeftRect.leftClicked())
 	{
 		--nowWorkNum;
-		nowWorkNum = (nowWorkNum + works.size()) % works.size();
+		nowWorkNum = (nowWorkNum + (int)works.size()) % (int)works.size();
 		resetDetailsRectTimer();
 	}
 	auto& work = works[nowWorkNum];
@@ -90,35 +90,23 @@ void Viewing::update()
 		work.y += Cursor::ScreenDelta().y;
 		if (work.workImage.width()*work.ragRatio <= Window::Width())
 		{
-			work.x = Min<double>(work.x, Window::Width() - work.workImage.width()*work.ragRatio / 2);
-			work.x = Max<double>(work.x, work.workImage.width()*work.ragRatio / 2);
+			work.x = (int32)Min<double>(work.x, Window::Width() - work.workImage.width()*work.ragRatio / 2);
+			work.x = (int32)Max<double>(work.x, work.workImage.width()*work.ragRatio / 2);
 		}
 		else
 		{
-			if (work.x + work.workImage.width()*work.ragRatio / 2 < Window::Width())
-			{
-				work.x = Window::Width() - work.workImage.width()*work.ragRatio / 2;
-			}
-			if (work.x - work.workImage.width()*work.ragRatio / 2 > 0)
-			{
-				work.x = work.workImage.width()*work.ragRatio / 2;
-			}
+			if ((int32)(work.x + (int32)(work.workImage.width()*work.ragRatio / 2)) < Window::Width()) work.x = (int32)(Window::Width() - work.workImage.width()*work.ragRatio / 2);
+			if ((int32)(work.x - (int32)(work.workImage.width()*work.ragRatio / 2)) > 0) work.x = (int32)(work.workImage.width()*work.ragRatio / 2);
 		}
 		if (work.workImage.height()*work.ragRatio <= Window::Height())
 		{
-			work.y = Min<double>(work.y, Window::Height() - work.workImage.height()*work.ragRatio / 2);
-			work.y = Max<double>(work.y, work.workImage.height()*work.ragRatio / 2);
+			work.y = (int32)Min<double>(work.y, Window::Height() - work.workImage.height()*work.ragRatio / 2);
+			work.y = (int32)Max<double>(work.y, work.workImage.height()*work.ragRatio / 2);
 		}
 		else
 		{
-			if (work.y + work.workImage.height()*work.ragRatio / 2 < Window::Height())
-			{
-				work.y = Window::Height() - work.workImage.height()*work.ragRatio / 2;
-			}
-			if (work.y - work.workImage.height()*work.ragRatio / 2 > 0)
-			{
-				work.y = work.workImage.height()*work.ragRatio / 2;
-			}
+			if ((int32)(work.y + (int32)(work.workImage.height()*work.ragRatio / 2)) < Window::Height()) work.y = (int32)(Window::Height() - work.workImage.height()*work.ragRatio / 2);
+			if ((int32)(work.y - (int32)(work.workImage.height()*work.ragRatio / 2)) > 0) work.y = (int32)(work.workImage.height()*work.ragRatio / 2);
 		}
 	}
 	if (resetImage.region(goRightRect.x - plusImage.width() - minusImage.width() - resetImage.width() - 45, 15).leftClicked())
