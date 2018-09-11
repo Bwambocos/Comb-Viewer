@@ -4,7 +4,7 @@
 #include <HamFramework.hpp>
 
 // const
-const String versionStr = U"v1.0";
+const String versionStr = U"v1.2";
 
 struct sharedData
 {
