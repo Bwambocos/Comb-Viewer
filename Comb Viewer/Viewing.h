@@ -13,6 +13,7 @@ const Color rectColor = Color(48, 48, 48, 150);
 const Color frameColor = Color(64, 64, 64);
 const Color highlightColor = Color(255, 165, 0, 150);
 const double ragRatioDiff = 1.0;
+const FilePath fontDataPath = U"data//fontData.otf";
 
 // ç\ë¢ëÃ
 struct work

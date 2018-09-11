@@ -30,8 +30,8 @@ Viewing::Viewing(const InitData& init) :IScene(init)
 	slideshowImage[0] = Texture(U"data//slideshowImage_0.png");
 	slideshowImage[1] = Texture(U"data//slideshowImage_1.png");
 	exitImage = Texture(U"data//exitImage.png");
-	titleFont = Font(36, Typeface::Bold);
-	makerFont = Font(28, Typeface::Medium);
+	titleFont = Font(36, fontDataPath);
+	makerFont = Font(28, fontDataPath);
 	// descriptionFont = Font(28);
 	goLeftTrg = Triangle(15, Window::Height() / 2, 45, Window::Height() / 2 - 30, 45, Window::Height() / 2 + 30);
 	goRightTrg = Triangle(Window::Width() - 15, Window::Height() / 2, Window::Width() - 45, Window::Height() / 2 - 30, Window::Width() - 45, Window::Height() / 2 + 30);
