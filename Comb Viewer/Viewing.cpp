@@ -30,20 +30,24 @@ Viewing::Viewing(const InitData& init) :IScene(init)
 	slideshowImage[0] = Texture(U"data//slideshowImage_0.png");
 	slideshowImage[1] = Texture(U"data//slideshowImage_1.png");
 	exitImage = Texture(U"data//exitImage.png");
-	titleFont = Font(48, Typeface::Bold);
-	makerFont = Font(36, Typeface::Medium);
+	titleFont = Font(36, Typeface::Bold);
+	makerFont = Font(28, Typeface::Medium);
 	// descriptionFont = Font(28);
 	goLeftTrg = Triangle(15, Window::Height() / 2, 45, Window::Height() / 2 - 30, 45, Window::Height() / 2 + 30);
 	goRightTrg = Triangle(Window::Width() - 15, Window::Height() / 2, Window::Width() - 45, Window::Height() / 2 - 30, Window::Width() - 45, Window::Height() / 2 + 30);
-	detailsRect = Rect(0, Window::Height() - titleFont.height() - 30, Window::Width(), titleFont.height() + 30);
+	detailsRect = Rect(0, Window::Height() - titleFont.height() - 15, Window::Width(), titleFont.height() + 15);
 	goLeftRect = Rect(0, 0, 60, Window::Height());
 	goRightRect = Rect(Window::Width() - 60, 0, 60, Window::Height());
 	detailsRectTimer.reset();
+	slideshowTimer.reset();
+	fadeTimer.reset();
 	prevMouseP = Cursor::Pos();
 	detailsRectDrawFlag = true;
 	pinnedFlag = false;
 	slideshowFlag = false;
 	nowWorkNum = 0;
+	fadeFlag = 0;
+	fadeNum = 0;
 }
 
 // ‰æ‘œ‰{—— XV
@@ -59,17 +63,21 @@ void Viewing::update()
 		else resetDetailsRectTimer();
 	}
 	else detailsRectDrawFlag = true;
-	if (KeyRight.down() || goRightRect.leftClicked() || slideshowTimer.query() >= slideshowMilliSec)
+	if (KeyRight.down() || goRightRect.leftClicked() || (slideshowTimer.query() >= slideshowMilliSec && slideshowFlag))
 	{
-		++nowWorkNum;
-		nowWorkNum %= works.size();
-		resetDetailsRectTimer();
+		nextWorkNum = nowWorkNum;
+		++nextWorkNum;
+		nextWorkNum %= works.size();
+		fadeFlag = -1;
+		fadeTimer.reset();
 	}
 	if (KeyLeft.down() || goLeftRect.leftClicked())
 	{
-		--nowWorkNum;
-		nowWorkNum = (nowWorkNum + (int)works.size()) % (int)works.size();
-		resetDetailsRectTimer();
+		nextWorkNum = nowWorkNum;
+		--nextWorkNum;
+		nextWorkNum = (nextWorkNum + (int)works.size()) % (int)works.size();
+		fadeFlag = -1;
+		fadeTimer.reset();
 	}
 	auto& work = works[nowWorkNum];
 	if (plusImage.region(goRightRect.x - plusImage.width() - 15, 15).leftClicked())
@@ -127,6 +135,27 @@ void Viewing::update()
 		slideshowTimer.update();
 	}
 	if (exitImage.region(goLeftRect.x + goLeftRect.w + pinImage[pinnedFlag].width() + slideshowImage[slideshowFlag].width() + 45, 15).leftClicked()) System::Exit();
+	if (fadeFlag == -1)
+	{
+		if (fadeTimer.query() >= fadeMilliSec)
+		{
+			fadeFlag = 1;
+			fadeTimer.reset();
+			nowWorkNum = nextWorkNum;
+		}
+		fadeNum = (int)((double)fadeTimer.query() / fadeMilliSec * 255.);
+		fadeTimer.update();
+	}
+	if (fadeFlag == 1)
+	{
+		if (fadeTimer.query() >= fadeMilliSec)
+		{
+			fadeFlag = 0;
+			fadeTimer.reset();
+		}
+		fadeNum = (int)(255. - (double)fadeTimer.query() / fadeMilliSec * 255.);
+		fadeTimer.update();
+	}
 }
 
 // ‰æ‘œ‰{—— •`‰æ
@@ -134,6 +163,7 @@ void Viewing::draw() const
 {
 	auto& work = works[nowWorkNum];
 	work.workImage.scaled(work.ragRatio).drawAt(work.x, work.y);
+	if (fadeFlag != 0) Window::ClientRect().draw(Color(0, 0, 0, fadeNum));
 	if (detailsRectDrawFlag)
 	{
 		goLeftRect.draw(rectColor);
@@ -142,17 +172,25 @@ void Viewing::draw() const
 		goRightRect.draw(rectColor);
 		goRightRect.drawFrame(3, 2, frameColor);
 		goRightTrg.draw(goRightRect.mouseOver() ? highlightColor : Color(200, 200, 200, 150));
-		detailsRect.draw(rectColor);
-		detailsRect.drawFrame(3, 2, frameColor);
-		titleFont(work.titleName).draw(15, detailsRect.y + detailsRect.h / 2 - titleFont.height() / 2, Palette::White);
-		makerFont(work.makerName).draw(Window::Width() - makerFont(work.makerName).region().w - 15, detailsRect.y + detailsRect.h / 2 - makerFont.height() / 2, Palette::White);
-		Rect(0, detailsRect.y - workShadowHeight, Window::Width(), workShadowHeight)(shadowImage).draw();
 		plusImage.draw(goRightRect.x - plusImage.width() - 15, 15);
 		minusImage.draw(goRightRect.x - plusImage.width() - minusImage.width() - 30, 15);
 		resetImage.draw(goRightRect.x - plusImage.width() - minusImage.width() - resetImage.width() - 45, 15);
 		pinImage[pinnedFlag].draw(goLeftRect.x + goLeftRect.w + 15, 15);
 		slideshowImage[slideshowFlag].draw(goLeftRect.x + goLeftRect.w + pinImage[pinnedFlag].width() + 30, 15);
 		exitImage.draw(goLeftRect.x + goLeftRect.w + pinImage[pinnedFlag].width() + slideshowImage[slideshowFlag].width() + 45, 15);
+		detailsRect.draw(rectColor);
+		detailsRect.drawFrame(3, 2, frameColor);
+		titleFont(work.titleName).draw(15, detailsRect.y + detailsRect.h / 2 - titleFont.height() / 2, Palette::White);
+		makerFont(work.makerName).draw(Window::Width() - makerFont(work.makerName).region().w - 15, detailsRect.y + detailsRect.h / 2 - makerFont.height() / 2, Palette::White);
+		Rect(0, detailsRect.y - workShadowHeight, Window::Width(), workShadowHeight)(shadowImage).draw();
+	}
+	else if (slideshowFlag)
+	{
+		detailsRect.draw(rectColor);
+		detailsRect.drawFrame(3, 2, frameColor);
+		titleFont(work.titleName).draw(15, detailsRect.y + detailsRect.h / 2 - titleFont.height() / 2, Palette::White);
+		makerFont(work.makerName).draw(Window::Width() - makerFont(work.makerName).region().w - 15, detailsRect.y + detailsRect.h / 2 - makerFont.height() / 2, Palette::White);
+		Rect(0, detailsRect.y - workShadowHeight, Window::Width(), workShadowHeight)(shadowImage).draw();
 	}
 }
 
