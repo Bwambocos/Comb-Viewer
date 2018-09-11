@@ -39,11 +39,15 @@ Viewing::Viewing(const InitData& init) :IScene(init)
 	goLeftRect = Rect(0, 0, 60, Window::Height());
 	goRightRect = Rect(Window::Width() - 60, 0, 60, Window::Height());
 	detailsRectTimer.reset();
+	slideshowTimer.reset();
+	fadeTimer.reset();
 	prevMouseP = Cursor::Pos();
 	detailsRectDrawFlag = true;
 	pinnedFlag = false;
 	slideshowFlag = false;
 	nowWorkNum = 0;
+	fadeFlag = 0;
+	fadeNum = 0;
 }
 
 // ‰æ‘œ‰{—— XV
@@ -61,15 +65,19 @@ void Viewing::update()
 	else detailsRectDrawFlag = true;
 	if (KeyRight.down() || goRightRect.leftClicked() || (slideshowTimer.query() >= slideshowMilliSec && slideshowFlag))
 	{
-		++nowWorkNum;
-		nowWorkNum %= works.size();
-		resetDetailsRectTimer();
+		nextWorkNum = nowWorkNum;
+		++nextWorkNum;
+		nextWorkNum %= works.size();
+		fadeFlag = -1;
+		fadeTimer.reset();
 	}
 	if (KeyLeft.down() || goLeftRect.leftClicked())
 	{
-		--nowWorkNum;
-		nowWorkNum = (nowWorkNum + (int)works.size()) % (int)works.size();
-		resetDetailsRectTimer();
+		nextWorkNum = nowWorkNum;
+		--nextWorkNum;
+		nextWorkNum = (nextWorkNum + (int)works.size()) % (int)works.size();
+		fadeFlag = -1;
+		fadeTimer.reset();
 	}
 	auto& work = works[nowWorkNum];
 	if (plusImage.region(goRightRect.x - plusImage.width() - 15, 15).leftClicked())
@@ -127,6 +135,28 @@ void Viewing::update()
 		slideshowTimer.update();
 	}
 	if (exitImage.region(goLeftRect.x + goLeftRect.w + pinImage[pinnedFlag].width() + slideshowImage[slideshowFlag].width() + 45, 15).leftClicked()) System::Exit();
+	if (fadeFlag == -1)
+	{
+		if (fadeTimer.query() >= fadeMilliSec)
+		{
+			fadeFlag = 1;
+			fadeTimer.reset();
+			nowWorkNum = nextWorkNum;
+			resetDetailsRectTimer();
+		}
+		fadeNum = (double)fadeTimer.query() / fadeMilliSec * 255.;
+		fadeTimer.update();
+	}
+	if (fadeFlag == 1)
+	{
+		if (fadeTimer.query() >= fadeMilliSec)
+		{
+			fadeFlag = 0;
+			fadeTimer.reset();
+		}
+		fadeNum = 255. - (double)fadeTimer.query() / fadeMilliSec * 255.;
+		fadeTimer.update();
+	}
 }
 
 // ‰æ‘œ‰{—— •`‰æ
@@ -134,6 +164,7 @@ void Viewing::draw() const
 {
 	auto& work = works[nowWorkNum];
 	work.workImage.scaled(work.ragRatio).drawAt(work.x, work.y);
+	if (fadeFlag != 0) Window::ClientRect().draw(Color(0, 0, 0, fadeNum));
 	if (detailsRectDrawFlag)
 	{
 		goLeftRect.draw(rectColor);
