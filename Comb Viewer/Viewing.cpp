@@ -59,7 +59,7 @@ void Viewing::update()
 		else resetDetailsRectTimer();
 	}
 	else detailsRectDrawFlag = true;
-	if (KeyRight.down() || goRightRect.leftClicked() || slideshowTimer.query() >= slideshowMilliSec)
+	if (KeyRight.down() || goRightRect.leftClicked() || (slideshowTimer.query() >= slideshowMilliSec && slideshowFlag))
 	{
 		++nowWorkNum;
 		nowWorkNum %= works.size();
