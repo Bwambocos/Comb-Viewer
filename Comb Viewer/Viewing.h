@@ -8,6 +8,7 @@
 const int32 workShadowHeight = 25;
 const uint64 detailsRectStairMilliSec = 3000;
 const uint64 slideshowMilliSec = 7500;
+const uint64 fadeMilliSec = 810;
 const Color rectColor = Color(48, 48, 48, 150);
 const Color frameColor = Color(64, 64, 64);
 const Color highlightColor = Color(255, 165, 0, 150);
@@ -31,10 +32,10 @@ private:
 	Font titleFont, makerFont, descriptionFont;
 	Triangle goLeftTrg, goRightTrg;
 	Rect detailsRect, goLeftRect, goRightRect;
-	myTimer detailsRectTimer, slideshowTimer;
+	myTimer detailsRectTimer, slideshowTimer, fadeTimer;
 	Point prevMouseP;
 	bool detailsRectDrawFlag, pinnedFlag, slideshowFlag;
-	int nowWorkNum;
+	int nowWorkNum, fadeFlag, fadeNum, nextWorkNum;
 
 public:
 	Viewing(const InitData& init);
