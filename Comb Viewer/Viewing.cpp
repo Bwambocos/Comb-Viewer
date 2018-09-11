@@ -143,7 +143,7 @@ void Viewing::update()
 			fadeTimer.reset();
 			nowWorkNum = nextWorkNum;
 		}
-		fadeNum = (double)fadeTimer.query() / fadeMilliSec * 255.;
+		fadeNum = (int)((double)fadeTimer.query() / fadeMilliSec * 255.);
 		fadeTimer.update();
 	}
 	if (fadeFlag == 1)
@@ -153,7 +153,7 @@ void Viewing::update()
 			fadeFlag = 0;
 			fadeTimer.reset();
 		}
-		fadeNum = 255. - (double)fadeTimer.query() / fadeMilliSec * 255.;
+		fadeNum = (int)(255. - (double)fadeTimer.query() / fadeMilliSec * 255.);
 		fadeTimer.update();
 	}
 }
